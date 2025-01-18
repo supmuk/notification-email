@@ -1,11 +1,16 @@
 const express = require('express');
 const app = express();
-const { Logger } = require('./config')
-const {nodeMailer} = require('./config/index')
+const { Logger, queue, nodeMailer } = require('./config')
+const routes = require('./routes/index')
 
-app.listen(9000, async function() {
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }))
+app.use('/api', routes);
+
+app.listen(9000, async function () {
+    // amqlib
     // console.log('connected')
-    Logger.log({ level: 'info', message: 'Server connected'})
+    // Logger.log({ level: 'info', message: 'Server connected' })
     // console.log(nodeMailer);
     // try {
     //     const response = await nodeMailer.sendMail({
@@ -20,5 +25,6 @@ app.listen(9000, async function() {
     // } catch (error) {
     //     console.log(error)
     // }
-    
+    await queue.connectQueue()
+    console.log('Queue Connected')
 });
